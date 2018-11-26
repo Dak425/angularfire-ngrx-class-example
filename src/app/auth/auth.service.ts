@@ -62,4 +62,8 @@ export class AuthService {
   logout() {
     this.afAuth.auth.signOut();
   }
+
+  viewer() {
+    return this.afAuth.auth.currentUser.uid;
+  }
 }

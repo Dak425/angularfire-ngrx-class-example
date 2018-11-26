@@ -14,7 +14,7 @@ import { take } from 'rxjs/operators';
 })
 export class CurrentTrainingComponent implements OnInit {
   progress = 0;
-  timer: number;
+  timer: NodeJS.Timer;
 
   constructor(
     private dialog: MatDialog,

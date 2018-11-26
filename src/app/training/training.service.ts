@@ -9,6 +9,7 @@ import { UIService } from '../shared/ui.service';
 import * as fromTraining from './training.reducer';
 import * as UI from '../shared/ui.actions';
 import * as Training from './training.actions';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class TrainingService {
@@ -17,6 +18,7 @@ export class TrainingService {
   constructor(
     private db: AngularFirestore,
     private uiService: UIService,
+    private authService: AuthService,
     private store: Store<fromTraining.State>
   ) {}
 
@@ -68,6 +70,7 @@ export class TrainingService {
           ...exercise,
           date: new Date(),
           state: 'completed',
+          user: this.authService.viewer(),
         });
         this.store.dispatch(new Training.StopTraining());
       });
@@ -84,6 +87,7 @@ export class TrainingService {
           calories: exercise.calories * (progress / 100),
           date: new Date(),
           state: 'cancelled',
+          user: this.authService.viewer(),
         });
         this.store.dispatch(new Training.StopTraining());
       });
