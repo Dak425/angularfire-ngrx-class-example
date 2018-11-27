@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { Subscription, Observable } from 'rxjs';
+import { map, take, last } from 'rxjs/operators';
 import { AngularFirestore } from 'angularfire2/firestore';
 
 import { Exercise } from './exercise.model';
 import { UIService } from '../shared/ui.service';
+import * as fromRoot from '../app.reducer';
 import * as fromTraining from './training.reducer';
 import * as UI from '../shared/ui.actions';
 import * as Training from './training.actions';
@@ -13,12 +14,15 @@ import * as Training from './training.actions';
 @Injectable()
 export class TrainingService {
   private fbSubs: Subscription[] = [];
+  private viewer$: Observable<string>;
 
   constructor(
     private db: AngularFirestore,
     private uiService: UIService,
     private store: Store<fromTraining.State>
-  ) {}
+  ) {
+    this.viewer$ = this.store.pipe(select(fromRoot.getViewer));
+  }
 
   fetchAvailableExercises() {
     this.store.dispatch(new UI.StartLoading());
@@ -70,6 +74,7 @@ export class TrainingService {
           ...exercise,
           date: new Date(),
           state: 'completed',
+          user: this.viewer(),
         };
         this.addDataToDatabase(finishedExercise);
         this.store.dispatch(new Training.StopTraining());
@@ -89,6 +94,7 @@ export class TrainingService {
           calories: exercise.calories * (progress / 100),
           date: new Date(),
           state: 'cancelled',
+          user: this.viewer(),
         };
         this.addDataToDatabase(finishedExercise);
         this.store.dispatch(new Training.StopTraining());
@@ -99,7 +105,7 @@ export class TrainingService {
     this.store.dispatch(new UI.StartLoading());
     this.fbSubs.push(
       this.db
-        .collection('finishedExercises')
+        .collection(this.getFinishedExerciseCollection())
         .valueChanges()
         .subscribe((exercises: Exercise[]) => {
           this.store.dispatch(new UI.StopLoading());
@@ -113,6 +119,16 @@ export class TrainingService {
   }
 
   private addDataToDatabase(exercise: Exercise) {
-    this.db.collection('finishedExercises').add(exercise);
+    this.db.collection(this.getFinishedExerciseCollection()).add(exercise);
+  }
+
+  private getFinishedExerciseCollection() {
+    return `finishedExercises/${this.viewer()}/data`;
+  }
+
+  private viewer() {
+    let viewer: string;
+    this.viewer$.pipe(take(1)).subscribe(uid => (viewer = uid));
+    return viewer;
   }
 }
