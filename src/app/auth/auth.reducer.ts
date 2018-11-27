@@ -6,10 +6,12 @@ import {
 
 export interface State {
   isAuthenticated: boolean;
+  viewer: string;
 }
 
 const initialState: State = {
   isAuthenticated: false,
+  viewer: null,
 };
 
 export function authReducer(state = initialState, action: AuthActions) {
@@ -17,10 +19,12 @@ export function authReducer(state = initialState, action: AuthActions) {
     case SET_AUTHENTICATED:
       return {
         isAuthenticated: true,
+        viewer: action.payload,
       };
     case SET_UNAUTHENTICATED:
       return {
         isAuthenticated: false,
+        viewer: null,
       };
     default:
       return state;
@@ -28,3 +32,4 @@ export function authReducer(state = initialState, action: AuthActions) {
 }
 
 export const getIsAuth = (state: State) => state.isAuthenticated;
+export const getViewer = (state: State) => state.viewer;

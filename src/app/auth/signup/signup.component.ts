@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 
 import * as fromRoot from '../../app.reducer';
 
@@ -14,7 +14,6 @@ import * as fromRoot from '../../app.reducer';
 export class SignupComponent implements OnInit {
   maxDate: Date;
   isLoading$: Observable<boolean>;
-  // loadingStateSub: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -22,12 +21,7 @@ export class SignupComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.isLoading$ = this.store.select(fromRoot.getIsLoading);
-    // this.loadingStateSub = this.uiService.loadingStateChanged.subscribe(
-    //   loading => {
-    //     this.isLoading = loading;
-    //   }
-    // );
+    this.isLoading$ = this.store.pipe(select(fromRoot.getIsLoading));
     this.maxDate = new Date();
     this.maxDate.setFullYear(this.maxDate.getFullYear() - 18);
   }
@@ -38,10 +32,4 @@ export class SignupComponent implements OnInit {
       password: form.value.password,
     });
   }
-
-  // ngOnDestroy() {
-  //   if (this.loadingStateSub) {
-  //     this.loadingStateSub.unsubscribe();
-  //   }
-  // }
 }

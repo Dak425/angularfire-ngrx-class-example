@@ -16,16 +16,20 @@ export const reducers: ActionReducerMap<State> = {
   auth: FromAuth.authReducer,
 };
 
-// UI State Convience functions
+// UI State functions
 export const getUIState = createFeatureSelector<fromUI.State>('ui');
 export const getIsLoading = createSelector(
   getUIState,
   fromUI.getIsLoading
 );
 
-// Auth State Convience functions
+// Auth State functions
 export const getAuthState = createFeatureSelector<FromAuth.State>('auth');
 export const getIsAuth = createSelector(
   getAuthState,
   FromAuth.getIsAuth
+);
+export const getViewer = createSelector(
+  getAuthState,
+  FromAuth.getViewer
 );

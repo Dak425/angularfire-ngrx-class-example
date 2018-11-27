@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { AngularFirestore } from 'angularfire2/firestore';
@@ -9,7 +9,6 @@ import { UIService } from '../shared/ui.service';
 import * as fromTraining from './training.reducer';
 import * as UI from '../shared/ui.actions';
 import * as Training from './training.actions';
-import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class TrainingService {
@@ -18,7 +17,6 @@ export class TrainingService {
   constructor(
     private db: AngularFirestore,
     private uiService: UIService,
-    private authService: AuthService,
     private store: Store<fromTraining.State>
   ) {}
 
@@ -63,32 +61,36 @@ export class TrainingService {
 
   completeExercise() {
     this.store
-      .select(fromTraining.getActiveTraining)
-      .pipe(take(1))
+      .pipe(
+        select(fromTraining.getActiveTraining),
+        take(1)
+      )
       .subscribe(exercise => {
-        this.addDataToDatabase({
+        const finishedExercise: Exercise = {
           ...exercise,
           date: new Date(),
           state: 'completed',
-          user: this.authService.viewer(),
-        });
+        };
+        this.addDataToDatabase(finishedExercise);
         this.store.dispatch(new Training.StopTraining());
       });
   }
 
   cancelExercise(progress: number) {
     this.store
-      .select(fromTraining.getActiveTraining)
-      .pipe(take(1))
+      .pipe(
+        select(fromTraining.getActiveTraining),
+        take(1)
+      )
       .subscribe(exercise => {
-        this.addDataToDatabase({
+        const finishedExercise: Exercise = {
           ...exercise,
           duration: exercise.duration * (progress / 100),
           calories: exercise.calories * (progress / 100),
           date: new Date(),
           state: 'cancelled',
-          user: this.authService.viewer(),
-        });
+        };
+        this.addDataToDatabase(finishedExercise);
         this.store.dispatch(new Training.StopTraining());
       });
   }
