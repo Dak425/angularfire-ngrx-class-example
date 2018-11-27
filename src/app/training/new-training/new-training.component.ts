@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 
 import { TrainingService } from '../training.service';
 import { Exercise } from '../exercise.model';
@@ -23,8 +23,10 @@ export class NewTrainingComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.isLoading$ = this.store.select(fromRoot.getIsLoading);
-    this.exercises$ = this.store.select(fromTraining.getAvailableExercises);
+    this.isLoading$ = this.store.pipe(select(fromRoot.getIsLoading));
+    this.exercises$ = this.store.pipe(
+      select(fromTraining.getAvailableExercises)
+    );
     this.fetchExercises();
   }
 
