@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { Subscription, Observable } from 'rxjs';
-import { map, take, last } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { AngularFirestore } from 'angularfire2/firestore';
 
 import { Exercise } from './exercise.model';
