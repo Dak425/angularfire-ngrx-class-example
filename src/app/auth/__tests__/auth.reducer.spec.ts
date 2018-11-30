@@ -12,6 +12,7 @@ describe('AuthReducer', () => {
     isAuthenticated: false,
     viewer: null,
   };
+  const fakeAction = new Auth.Test();
 
   it('should return correct state on "SetAuthentication" action', () => {
     expect(fromAuth.authReducer(authActionState, authAction)).toEqual(
@@ -23,5 +24,17 @@ describe('AuthReducer', () => {
       unAuthActionState
     );
   });
-  it('should return initial state on "default" case', () => {});
+  it('should return current state on "default" case', () => {
+    expect(fromAuth.authReducer(authActionState, fakeAction)).toEqual(
+      authActionState
+    );
+  });
+  it('has a function called getIsAuth that returns isAuth from the state', () => {
+    expect(fromAuth.getIsAuth(authActionState)).toEqual(
+      authActionState.isAuthenticated
+    );
+  });
+  it('has a function called getViewer that returns the viewer property from the state', () => {
+    expect(fromAuth.getViewer(authActionState)).toEqual(authActionState.viewer);
+  });
 });

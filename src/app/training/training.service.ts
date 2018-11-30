@@ -105,7 +105,9 @@ export class TrainingService {
     this.store.dispatch(new UI.StartLoading());
     this.fbSubs.push(
       this.db
-        .collection(this.getFinishedExerciseCollection())
+        .collection(this.getFinishedExerciseCollection(), ref =>
+          ref.where('user', '==', this.viewer())
+        )
         .valueChanges()
         .subscribe((exercises: Exercise[]) => {
           this.store.dispatch(new UI.StopLoading());
@@ -122,11 +124,11 @@ export class TrainingService {
     this.db.collection(this.getFinishedExerciseCollection()).add(exercise);
   }
 
-  private getFinishedExerciseCollection() {
-    return `finishedExercises/${this.viewer()}/data`;
+  private getFinishedExerciseCollection(): string {
+    return 'finishedExercises';
   }
 
-  private viewer() {
+  private viewer(): string {
     let viewer: string;
     this.viewer$.pipe(take(1)).subscribe(uid => (viewer = uid));
     return viewer;
